@@ -23,7 +23,7 @@ const notes = [
             sizes="(max-width: 900px) 78vw, 380px"
           />
         </div>
-        <figcaption>有点乱，但是我的窝</figcaption>
+        <figcaption>我的小窝</figcaption>
       </figure>
 
       <figure class="window-card" data-reveal style="--reveal-delay:180ms">
@@ -206,7 +206,7 @@ const notes = [
     line-height: 1.5;
     letter-spacing: 0.03em;
     color: var(--cream);
-    text-shadow: 0 2px 30px rgba(8, 17, 19, 0.5);
+    text-shadow: 0 2px 30px rgba(16, 13, 11, 0.62);
   }
 
   .about__text p {
@@ -322,7 +322,9 @@ const notes = [
     }
 
     .window-card {
-      display: none;
+      display: block;
+      width: 138px;
+      margin: 20px 6% 0 auto;
     }
 
     .about__body {
@@ -337,14 +339,22 @@ const notes = [
 
   @media (max-width: 560px) {
     .notes {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
     }
 
-    .note,
-    .note:nth-child(2),
-    .note:nth-child(3) {
-      transform: rotate(0);
+    .note {
+      padding: 24px 9px 14px;
+    }
+
+    .note__label {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+    }
+
+    .note p {
+      font-size: 12px;
+      line-height: 1.7;
     }
 
     .about__text p {

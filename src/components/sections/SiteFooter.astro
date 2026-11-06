@@ -1,8 +1,19 @@
 ---
 const links = [
-  { label: '邮箱', href: 'mailto:hi@example.com' },
-  { label: 'GitHub', href: '#' },
-  { label: 'Bilibili', href: '#' },
+  {
+    label: 'Bilibili',
+    href: 'https://space.bilibili.com/3546846282648261',
+    icon: '/icons/bilibili.svg',
+    width: 2240,
+    height: 1024,
+  },
+  {
+    label: '小红书',
+    href: 'https://www.xiaohongshu.com/user/profile/679b304a000000000a03d77e',
+    icon: '/icons/xiaohongshu.png',
+    width: 205,
+    height: 96,
+  },
 ];
 ---
 
@@ -12,11 +23,26 @@ const links = [
     <p class="site-footer__line">啊内个内个内个内个</p>
 
     <div class="site-footer__bottom">
-      <ul class="site-footer__links" aria-label="联系方式">
+      <ul class="site-footer__links" aria-label="社交主页">
         {
           links.map((link) => (
             <li>
-              <a href={link.href}>{link.label}</a>
+              <a
+                class="brand-link"
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${link.label} 主页`}
+              >
+                <img
+                  src={link.icon}
+                  alt=""
+                  width={link.width}
+                  height={link.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
             </li>
           ))
         }
@@ -35,7 +61,7 @@ const links = [
     overflow: hidden;
     padding: clamp(88px, 12vh, 140px) 0 42px;
     border-top: 1px solid rgba(246, 231, 211, 0.08);
-    background: linear-gradient(to bottom, rgba(8, 17, 19, 0), rgba(8, 17, 19, 0.7));
+    background: linear-gradient(to bottom, rgba(9, 7, 6, 0), rgba(9, 7, 6, 0.72));
   }
 
   .site-footer::before {
@@ -76,37 +102,32 @@ const links = [
   .site-footer__links {
     display: flex;
     flex-wrap: wrap;
-    gap: clamp(18px, 3vw, 34px);
+    align-items: center;
+    gap: clamp(16px, 2.6vw, 28px);
   }
 
-  .site-footer__links a {
-    position: relative;
-    padding-block: 4px;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    color: rgba(201, 174, 149, 0.82);
-    transition: color 0.3s ease;
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding-inline: 2px;
+    opacity: 0.78;
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s var(--ease-soft),
+      filter 0.35s ease;
   }
 
-  .site-footer__links a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 1px;
-    background: var(--amber);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.35s var(--ease-soft);
+  .brand-link img {
+    display: block;
+    width: auto;
+    height: 26px;
   }
 
-  .site-footer__links a:hover {
-    color: var(--amber-soft);
-  }
-
-  .site-footer__links a:hover::after {
-    transform: scaleX(1);
+  .brand-link:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+    filter: drop-shadow(0 0 12px rgba(255, 178, 74, 0.28));
   }
 
   .lights-out {
