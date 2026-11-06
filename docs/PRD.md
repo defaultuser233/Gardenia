@@ -6,8 +6,8 @@
 | 形态 | 单页个人主页，纯静态 |
 | 技术栈 | Astro 7 + React 岛 + TypeScript，pnpm 管理 |
 | 目标环境 | 桌面与移动浏览器，先本地预览 |
-| 文档版本 | v1.3 |
-| 状态 | M2 已实现（本地可运行；已移除首屏吊灯，加入柔光游动、火星、星点与指针视差） |
+| 文档版本 | v1.4 |
+| 状态 | M2 已实现（本地可运行；已移除首屏吊灯，加入柔光游动、火星、星点、指针视差与触屏倾斜视差） |
 
 ---
 
@@ -126,7 +126,7 @@
 
 ### 3.4 页面线框（移动端）
 
-单列：标题 → 副标题 → 向下提示 → 拍立得 + 窗外小卡（拍立得居中，小卡偏右下方）→ 正文段落 → 便签卡三列 → 页脚。导航简化为左 `Gardenia` + 右 `关于`。
+单列：标题 → 副标题 →「轻轻晃一晃」倾斜开关 → 向下提示 → 拍立得 + 窗外小卡（拍立得居中，小卡偏右下方）→ 正文段落 → 便签卡三列 → 页脚。导航简化为左 `Gardenia` + 右 `关于`。
 
 ---
 
@@ -200,6 +200,7 @@
 | 火星粒子 | canvas 30–60 颗上升光尘，`lighter` 混合，单 rAF 驱动 | 隐藏画布 |
 | 星点闪烁 | 移动端 32 / 桌面 48 颗 2px 红白黄星点，客户端随机铺满首屏并叠在照片上，1.5–3.5s 闪烁，指针视差约 18px | 静态、压暗 |
 | 指针视差 | 光斑 22px / 照片 8px / 星点 18px，无指针时正弦漂移 | 触屏 / `reduced-motion` 关闭 |
+| 触屏倾斜视差 | 触屏显示「轻轻晃一晃」；点击后按相对 ±20° 倾斜映射到 `--px / --py`，关闭后约 0.6s 回正 | 无传感器 / 拒绝权限不可用；`reduced-motion` 隐藏 |
 | 滚动淡入 | IntersectionObserver，threshold 0.12，700ms，只播一次 | 直接显示 |
 | 链接 hover | 0.35s 颜色过渡 + 细暖线展开 | 只变颜色 |
 | 页面切换 | 无（单页） | — |
@@ -349,7 +350,8 @@ Gardenia/
 - 首屏背景图用 `<Image>` 并 `loading="eager"`、`fetchpriority="high"`；其余图片 `loading="lazy"`、`decoding="async"`。
 - `CursorGlow` 用 `requestAnimationFrame` 做插值，监听 `pointermove`；`(pointer: coarse)` 或 `prefers-reduced-motion: reduce` 时不挂载逻辑。
 - 首屏火星与指针视差共用一个原生 `requestAnimationFrame` 循环：canvas 按 DPR（上限 2）缩放，粒子数随面积取 14–64，`IntersectionObserver` 在首屏离开视口时暂停绘制。
-- 视差只写 CSS 变量 `--px / --py`；无指针时用正弦缓慢漂移，触屏不启用。
+- 视差只写 CSS 变量 `--px / --py`；桌面跟随指针、无指针时用正弦缓慢漂移，触屏需用户点开「轻轻晃一晃」。
+- 触屏倾斜：`(pointer: coarse)` 且支持 `DeviceOrientationEvent` 时显示开关；iOS 13+ 在点击手势里调用 `requestPermission()`，用首个读数作基线，±20° 映射到 `--px / --py`；关闭后停止监听并平滑回零。
 - 星星由客户端 `Math.random()` 生成（移动端 32 / 桌面 48），位置与闪烁相位每次刷新都不同；样式用 `.hero__stars :global(.star)` 作用到 JS 创建的节点上；纯装饰层，禁用 JS 时为空，不影响正文与照片。
 - 「回到门口」按钮与导航用原生脚本实现，避免为它们单独拉 React 岛。
 - 噪点用一张 `public/noise.svg`（feTurbulence），避免生成图片。

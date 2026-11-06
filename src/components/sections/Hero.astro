@@ -36,6 +36,18 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
       <span class="hero__title-line hero__title-accent">回家。</span>
     </h1>
     <p class="hero__sub">这里留着一盏灯，和一点甜的。</p>
+
+    <button
+      class="motion-toggle"
+      type="button"
+      data-motion-toggle
+      aria-pressed="false"
+      aria-label="开启手机晃动背景"
+      hidden
+    >
+      <span class="motion-toggle__dot" aria-hidden="true"></span>
+      <span data-motion-label aria-live="polite">轻轻晃一晃</span>
+    </button>
   </div>
 
   <div class="hero__scroll" aria-hidden="true">
@@ -211,6 +223,71 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
     line-height: 1.95;
     letter-spacing: 0.04em;
     color: rgba(246, 231, 211, 0.74);
+  }
+
+  /* 触屏设备：用倾斜手机驱动背景视差 */
+  .motion-toggle {
+    display: none;
+    align-items: center;
+    gap: 9px;
+    margin-top: 26px;
+    padding: 9px 16px;
+    border: 1px solid rgba(246, 231, 211, 0.16);
+    border-radius: 999px;
+    background: rgba(24, 19, 15, 0.5);
+    backdrop-filter: blur(6px);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: rgba(201, 174, 149, 0.88);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  @media (pointer: coarse) {
+    .motion-toggle:not([hidden]) {
+      display: inline-flex;
+    }
+  }
+
+  .motion-toggle:hover {
+    color: var(--cream);
+    border-color: rgba(255, 178, 74, 0.35);
+    background: rgba(255, 178, 74, 0.07);
+  }
+
+  .motion-toggle[aria-pressed='true'] {
+    color: var(--amber-soft);
+    border-color: rgba(255, 178, 74, 0.38);
+    background: rgba(255, 178, 74, 0.08);
+  }
+
+  .motion-toggle__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff6e2, var(--amber) 70%);
+    box-shadow: 0 0 8px rgba(255, 178, 74, 0.6);
+    transition:
+      filter 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .motion-toggle[aria-pressed='true'] .motion-toggle__dot {
+    animation: motion-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes motion-pulse {
+    0%,
+    100% {
+      filter: brightness(0.85);
+      transform: scale(0.9);
+    }
+    50% {
+      filter: brightness(1.15);
+      transform: scale(1.2);
+    }
   }
 
   /* 夜空里的小星点 */
@@ -395,6 +472,7 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
   @media (prefers-reduced-motion: reduce) {
     .hero__blob,
     .hero__stars :global(.star),
+    .motion-toggle__dot,
     .hero__scroll i::after {
       animation: none;
     }
@@ -444,6 +522,13 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
     const ctx = canvas.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const motionButton = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+
+    let motionActive = false;
+    let motionBaseline: { beta: number; gamma: number } | null = null;
+    let motionTargetX = 0;
+    let motionTargetY = 0;
 
     let width = 0;
     let height = 0;
@@ -547,6 +632,86 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
       });
     }
 
+    const ORIENTATION_RANGE = 20;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      if (event.beta === null || event.gamma === null) return;
+
+      if (!motionBaseline) {
+        motionBaseline = { beta: event.beta, gamma: event.gamma };
+        return;
+      }
+
+      const x = (event.gamma - motionBaseline.gamma) / ORIENTATION_RANGE;
+      const y = (event.beta - motionBaseline.beta) / ORIENTATION_RANGE;
+      motionTargetX = Math.max(-1, Math.min(1, x));
+      motionTargetY = Math.max(-1, Math.min(1, y));
+    };
+
+    const setMotionLabel = (text: string) => {
+      const label = motionButton?.querySelector<HTMLElement>('[data-motion-label]');
+      if (label) label.textContent = text;
+    };
+
+    const stopMotion = () => {
+      motionActive = false;
+      motionBaseline = null;
+      motionTargetX = 0;
+      motionTargetY = 0;
+      window.removeEventListener('deviceorientation', handleOrientation, true);
+
+      if (motionButton) {
+        motionButton.setAttribute('aria-pressed', 'false');
+        motionButton.setAttribute('aria-label', '开启手机晃动背景');
+      }
+      setMotionLabel('轻轻晃一晃');
+    };
+
+    const requestMotionAccess = async () => {
+      const MotionEvent = window.DeviceOrientationEvent as
+        | (typeof DeviceOrientationEvent & {
+            requestPermission?: () => Promise<string>;
+          })
+        | undefined;
+
+      if (MotionEvent && typeof MotionEvent.requestPermission === 'function') {
+        try {
+          return (await MotionEvent.requestPermission()) === 'granted';
+        } catch {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    if (motionButton && coarsePointer && 'DeviceOrientationEvent' in window) {
+      motionButton.hidden = false;
+
+      motionButton.addEventListener('click', async () => {
+        if (motionActive) {
+          stopMotion();
+          return;
+        }
+
+        const granted = await requestMotionAccess();
+        if (!granted) {
+          setMotionLabel('未获得权限');
+          window.setTimeout(() => {
+            if (!motionActive) setMotionLabel('轻轻晃一晃');
+          }, 2200);
+          return;
+        }
+
+        motionBaseline = null;
+        motionActive = true;
+        window.addEventListener('deviceorientation', handleOrientation, true);
+        motionButton.setAttribute('aria-pressed', 'true');
+        motionButton.setAttribute('aria-label', '关闭手机晃动背景');
+        setMotionLabel('正在随你晃');
+      });
+    }
+
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(
         ([entry]) => {
@@ -571,9 +736,24 @@ import boardwalk from '../../assets/photos/boardwalk.jpg';
             targetX = Math.sin(now / 9000) * 0.26;
             targetY = Math.cos(now / 11000) * 0.2;
           }
+        } else if (motionActive) {
+          targetX = motionTargetX;
+          targetY = motionTargetY;
+        }
 
+        const parallaxActive = finePointer || motionActive;
+
+        if (parallaxActive) {
           currentX += (targetX - currentX) * Math.min(1, delta * 2.4);
           currentY += (targetY - currentY) * Math.min(1, delta * 2.4);
+        } else if (Math.abs(currentX) > 0.001 || Math.abs(currentY) > 0.001) {
+          currentX += (0 - currentX) * Math.min(1, delta * 4);
+          currentY += (0 - currentY) * Math.min(1, delta * 4);
+          if (Math.abs(currentX) < 0.002) currentX = 0;
+          if (Math.abs(currentY) < 0.002) currentY = 0;
+        }
+
+        if (parallaxActive || currentX !== 0 || currentY !== 0) {
           hero.style.setProperty('--px', currentX.toFixed(3));
           hero.style.setProperty('--py', currentY.toFixed(3));
         }
