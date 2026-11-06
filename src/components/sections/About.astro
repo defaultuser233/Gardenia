@@ -1,0 +1,354 @@
+---
+import { Image } from 'astro:assets';
+import nest from '../../assets/photos/nest.jpg';
+import streetlight from '../../assets/photos/streetlight.jpg';
+
+const notes = [
+  { label: '现在', text: '不知道写什么😺' },
+  { label: '在听', text: '不知道写什么😺' },
+  { label: '甜食', text: '不知道写什么😺' },
+];
+---
+
+<section class="about" id="about" aria-labelledby="about-title">
+  <div class="container about__grid">
+    <div class="about__gallery" data-reveal>
+      <figure class="polaroid">
+        <span class="polaroid__tape" aria-hidden="true"></span>
+        <div class="polaroid__frame">
+          <Image
+            src={nest}
+            alt="戴着黄色毛绒兽装脑袋，窝在白色毯子里打游戏"
+            widths={[360, 560, 760]}
+            sizes="(max-width: 900px) 78vw, 380px"
+          />
+        </div>
+        <figcaption>有点乱，但是我的窝</figcaption>
+      </figure>
+
+      <figure class="window-card" data-reveal style="--reveal-delay:180ms">
+        <Image
+          src={streetlight}
+          alt="夜里的路灯透过树叶照下来，路边停着一辆自行车"
+          widths={[240, 380, 520]}
+          sizes="190px"
+        />
+        <figcaption>夜路</figcaption>
+      </figure>
+    </div>
+
+    <div class="about__body">
+      <p class="eyebrow">关于我</p>
+      <h2 class="about__title" id="about-title">
+        我住在一间<br />灯比外面暖的屋子里。
+      </h2>
+
+      <div class="about__text" data-reveal>
+        <p>
+          晚上打游戏。房间的灯总比需要的更暗一点，窗帘留一条缝，让楼下路灯的光照进来。
+        </p>
+        <p>
+          晚上世界会安静很多。周末通常在被窝里、在 Minecraft
+          里，或者在被窝里。
+        </p>
+        <p>😺😸😻😼😽😾</p>
+      </div>
+
+      <p class="about__sign" data-reveal>
+        <span>— Gardenia</span>
+        <span class="about__stamp" aria-hidden="true">G</span>
+      </p>
+
+      <ul class="notes" data-reveal style="--reveal-delay:120ms">
+        {
+          notes.map((note) => (
+            <li class="note">
+              <span class="note__pin" aria-hidden="true" />
+              <span class="note__label">{note.label}</span>
+              <p>{note.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    position: relative;
+    overflow: hidden;
+    padding: var(--section-y) 0 calc(var(--section-y) * 1.15);
+  }
+
+  .about::before {
+    content: '';
+    position: absolute;
+    top: 4%;
+    left: -12%;
+    width: 760px;
+    height: 760px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 178, 74, 0.07), transparent 66%);
+    pointer-events: none;
+  }
+
+  .about__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: clamp(48px, 7vw, 104px);
+  }
+
+  /* 拍立得 */
+  .polaroid {
+    position: relative;
+    width: min(100%, 380px);
+    padding: 14px 14px 0;
+    background: linear-gradient(160deg, #f8efdf, #eadcc6);
+    border-radius: 3px;
+    box-shadow: var(--shadow-far);
+    transform: rotate(-2.4deg);
+    transition:
+      transform 0.45s var(--ease-soft),
+      box-shadow 0.45s var(--ease-soft);
+  }
+
+  .polaroid:hover {
+    transform: rotate(0.4deg) translateY(-6px);
+    box-shadow: 0 40px 90px rgba(30, 10, 4, 0.62);
+  }
+
+  .polaroid__tape {
+    position: absolute;
+    top: -13px;
+    left: 26px;
+    width: 76px;
+    height: 25px;
+    background: rgba(238, 224, 196, 0.55);
+    transform: rotate(-6deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(2px);
+  }
+
+  .polaroid__frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #cbb79a;
+  }
+
+  .polaroid__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 58% 50%;
+    filter: sepia(0.14) saturate(0.88) brightness(0.9) contrast(1.03);
+  }
+
+  .polaroid__frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 178, 74, 0.12);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+
+  .polaroid figcaption {
+    padding: 15px 4px 19px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    color: #4a3428;
+  }
+
+  /* 贴在旁边的小照片 */
+  .window-card {
+    width: 190px;
+    margin: 26px 6px 0 auto;
+    padding: 8px 8px 0;
+    background: #efe2cf;
+    border-radius: 2px;
+    box-shadow: var(--shadow-near);
+    transform: rotate(3deg);
+    transition: transform 0.45s var(--ease-soft);
+  }
+
+  .window-card:hover {
+    transform: rotate(0.6deg) translateY(-4px);
+  }
+
+  .window-card :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    filter: sepia(0.18) saturate(0.85) brightness(0.78);
+  }
+
+  .window-card figcaption {
+    padding: 7px 2px 10px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    color: rgba(74, 52, 40, 0.72);
+  }
+
+  /* 文本 */
+  .about__title {
+    margin-bottom: 34px;
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+    color: var(--cream);
+    text-shadow: 0 2px 30px rgba(8, 17, 19, 0.5);
+  }
+
+  .about__text p {
+    margin-bottom: 20px;
+    font-size: 16.5px;
+    line-height: 2.02;
+    color: rgba(246, 231, 211, 0.86);
+  }
+
+  .about__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about__sign {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0 42px;
+    font-family: var(--font-display);
+    font-size: 19px;
+    letter-spacing: 0.08em;
+    color: var(--amber-soft);
+    opacity: 0.92;
+  }
+
+  .about__stamp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(226, 104, 60, 0.7);
+    border-radius: 50%;
+    font-size: 13px;
+    color: var(--ember);
+    transform: rotate(-10deg);
+    box-shadow: inset 0 0 8px rgba(226, 104, 60, 0.16);
+  }
+
+  /* 便签 */
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .note {
+    position: relative;
+    padding: 27px 16px 18px;
+    background: linear-gradient(165deg, #f6ecd9, #e9dcc4);
+    border-radius: 6px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+    color: var(--paper-ink);
+    transform: rotate(-1.2deg);
+    transition:
+      transform 0.35s var(--ease-soft),
+      box-shadow 0.35s var(--ease-soft);
+  }
+
+  .note:nth-child(2) {
+    transform: rotate(1deg);
+  }
+
+  .note:nth-child(3) {
+    transform: rotate(-0.6deg);
+  }
+
+  .note:hover {
+    transform: rotate(0) translateY(-4px);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  .note__pin {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffd0a1, #c05a34 70%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  .note__label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: rgba(74, 52, 40, 0.55);
+  }
+
+  .note p {
+    font-size: 13.5px;
+    line-height: 1.8;
+    color: var(--paper-ink);
+  }
+
+  @media (max-width: 900px) {
+    .about__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 56px;
+    }
+
+    .about__gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .polaroid {
+      width: min(78vw, 320px);
+    }
+
+    .window-card {
+      display: none;
+    }
+
+    .about__body {
+      max-width: 36em;
+      margin-inline: auto;
+    }
+
+    .about__title br {
+      display: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .notes {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .note,
+    .note:nth-child(2),
+    .note:nth-child(3) {
+      transform: rotate(0);
+    }
+
+    .about__text p {
+      font-size: 16px;
+    }
+  }
+</style>

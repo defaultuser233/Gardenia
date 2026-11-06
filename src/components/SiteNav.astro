@@ -1,0 +1,132 @@
+---
+const links = [
+  { href: '#about', label: '关于', id: 'about' },
+  { href: '#bye', label: '找得到我', id: 'bye' },
+];
+---
+
+<header class="site-nav" data-nav>
+  <a class="site-nav__brand" href="#top">GARDENIA</a>
+  <nav class="site-nav__links" aria-label="页面导航">
+    {
+      links.map((link) => (
+        <a href={link.href} data-nav-link={link.id}>
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  .site-nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px var(--gutter);
+    transition:
+      padding 0.45s var(--ease-soft),
+      background-color 0.45s ease,
+      border-color 0.45s ease,
+      backdrop-filter 0.45s ease;
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-nav.is-scrolled {
+    padding-block: 13px;
+    background-color: rgba(8, 17, 19, 0.72);
+    border-bottom-color: rgba(246, 231, 211, 0.08);
+    backdrop-filter: blur(14px);
+  }
+
+  .site-nav__brand {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--cream-dim);
+    transition: color 0.3s ease;
+  }
+
+  .site-nav__brand:hover {
+    color: var(--amber-soft);
+  }
+
+  .site-nav__links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 3vw, 36px);
+  }
+
+  .site-nav__links a {
+    position: relative;
+    padding-block: 6px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: rgba(201, 174, 149, 0.78);
+    transition: color 0.3s ease;
+  }
+
+  .site-nav__links a:hover,
+  .site-nav__links a.is-active {
+    color: var(--cream);
+  }
+
+  .site-nav__links a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -2px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 6px rgba(255, 178, 74, 0.8);
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .site-nav__links a.is-active::after {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+
+<script>
+  const sections = ['about', 'bye']
+    .map((id) => document.getElementById(id))
+    .filter((section): section is HTMLElement => Boolean(section));
+
+  const navLinks = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'),
+  );
+
+  if (sections.length) {
+    const updateActive = () => {
+      const marker = window.innerHeight * 0.45;
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+
+      const current = atBottom
+        ? sections[sections.length - 1]?.id
+        : sections.find((section) => {
+            const rect = section.getBoundingClientRect();
+            return rect.top <= marker && rect.bottom >= marker;
+          })?.id;
+
+      navLinks.forEach((link) => {
+        link.classList.toggle('is-active', link.dataset.navLink === current);
+      });
+    };
+
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+  }
+</script>

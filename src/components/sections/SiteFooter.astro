@@ -1,0 +1,154 @@
+---
+const links = [
+  { label: '邮箱', href: 'mailto:hi@example.com' },
+  { label: 'GitHub', href: '#' },
+  { label: 'Bilibili', href: '#' },
+];
+---
+
+<footer class="site-footer" id="bye">
+  <div class="container">
+    <p class="eyebrow">老吴</p>
+    <p class="site-footer__line">啊内个内个内个内个</p>
+
+    <div class="site-footer__bottom">
+      <ul class="site-footer__links" aria-label="联系方式">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <button class="lights-out" id="lights-out" type="button">芜狐 ↑</button>
+    </div>
+
+    <p class="site-footer__copy">© 2026 Gardenia</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(88px, 12vh, 140px) 0 42px;
+    border-top: 1px solid rgba(246, 231, 211, 0.08);
+    background: linear-gradient(to bottom, rgba(8, 17, 19, 0), rgba(8, 17, 19, 0.7));
+  }
+
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -320px;
+    width: 900px;
+    height: 620px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 178, 74, 0.09), transparent 66%);
+    pointer-events: none;
+  }
+
+  .site-footer .container {
+    position: relative;
+  }
+
+  .site-footer__line {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.55;
+    letter-spacing: 0.03em;
+    color: var(--cream);
+    text-shadow: 0 0 44px rgba(255, 178, 74, 0.16);
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-top: 46px;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(18px, 3vw, 34px);
+  }
+
+  .site-footer__links a {
+    position: relative;
+    padding-block: 4px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: rgba(201, 174, 149, 0.82);
+    transition: color 0.3s ease;
+  }
+
+  .site-footer__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s var(--ease-soft);
+  }
+
+  .site-footer__links a:hover {
+    color: var(--amber-soft);
+  }
+
+  .site-footer__links a:hover::after {
+    transform: scaleX(1);
+  }
+
+  .lights-out {
+    padding: 10px 18px;
+    border: 1px solid rgba(246, 231, 211, 0.16);
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: rgba(201, 174, 149, 0.86);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  .lights-out:hover {
+    color: var(--amber-soft);
+    border-color: rgba(255, 178, 74, 0.35);
+    background: rgba(255, 178, 74, 0.06);
+  }
+
+  .site-footer__copy {
+    margin-top: 54px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: rgba(201, 174, 149, 0.46);
+  }
+
+  @media (max-width: 560px) {
+    .site-footer__bottom {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 22px;
+    }
+  }
+</style>
+
+<script>
+  const lightsOut = document.getElementById('lights-out');
+
+  lightsOut?.addEventListener('click', () => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+</script>

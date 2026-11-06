@@ -1,0 +1,39 @@
+:root {
+  color-scheme: dark;
+
+  /* 夜 */
+  --night-900: #081113;
+  --night-800: #0b1618;
+  --night-700: #101f20;
+  --night-600: #16292a;
+
+  /* 灯 */
+  --amber: #ffb24a;
+  --amber-soft: #ffe9c4;
+  --ember: #e2683c;
+  --ember-deep: #a8442a;
+
+  /* 纸与字 */
+  --cream: #f6e7d3;
+  --cream-dim: #c9ae95;
+  --paper: #f4e9d8;
+  --paper-ink: #4a3428;
+  --wood: #6b3f26;
+
+  /* 字体 */
+  --font-display: 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC Variable', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* 尺度 */
+  --container: 1080px;
+  --gutter: clamp(20px, 5vw, 48px);
+  --section-y: clamp(88px, 14vh, 160px);
+  --radius-card: 14px;
+
+  /* 影 */
+  --shadow-near: 0 12px 30px rgba(40, 16, 8, 0.45);
+  --shadow-far: 0 30px 80px rgba(30, 10, 4, 0.55);
+
+  /* 缓动 */
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}

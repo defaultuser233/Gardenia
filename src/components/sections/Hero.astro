@@ -1,0 +1,630 @@
+---
+import { Image } from 'astro:assets';
+import boardwalk from '../../assets/photos/boardwalk.jpg';
+
+const starColors = ['white', 'yellow', 'red'] as const;
+
+const stars = Array.from({ length: 26 }, (_, index) => ({
+  left: (index * 37 + 9) % 100,
+  top: (index * 51 + 5) % 58,
+  size: index % 9 === 0 ? 3 : 2,
+  delay: -((index * 1.3) % 5),
+  duration: 3 + (index % 5) * 0.9,
+  color: starColors[index % starColors.length],
+}));
+---
+
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero__media" aria-hidden="true">
+    <Image
+      class="hero__photo"
+      src={boardwalk}
+      alt=""
+      widths={[768, 1280, 1920]}
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="hero__glow" aria-hidden="true">
+    <span class="hero__blob hero__blob--amber"></span>
+    <span class="hero__blob hero__blob--ember"></span>
+    <span class="hero__blob hero__blob--dusk"></span>
+  </div>
+
+  <div class="hero__stars" aria-hidden="true">
+    {
+      stars.map((star) => (
+        <span
+          class={`star star--${star.color}`}
+          style={`--x:${star.left}%;--y:${star.top}%;--s:${star.size}px;--delay:${star.delay}s;--d:${star.duration}s`}
+        />
+      ))
+    }
+  </div>
+
+  <canvas class="hero__embers" id="hero-embers" aria-hidden="true"></canvas>
+
+  <div class="hero__content container">
+    <p class="eyebrow">Gardenia · 栀子</p>
+    <h1 class="hero__title" id="hero-title">
+      <span class="hero__title-line">今晚也早点</span><br class="hero__break" />
+      <span class="hero__title-line hero__title-accent">回家。</span>
+    </h1>
+    <p class="hero__sub">这里留着一盏灯，和一点甜的。</p>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <span>往下走</span>
+    <i></i>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --px: 0;
+    --py: 0;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: clamp(140px, 20vh, 210px) 0 clamp(150px, 22vh, 220px);
+    overflow: hidden;
+  }
+
+  /* 木栈道：只留底部一条，向上融进夜色 */
+  .hero__media {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 0;
+    height: 47%;
+    background:
+      radial-gradient(60% 90% at 68% 90%, rgba(226, 104, 60, 0.18), transparent 70%),
+      var(--night-800);
+  }
+
+  .hero__photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 68%;
+    filter: sepia(0.14) saturate(0.95) brightness(0.8) contrast(1.04);
+    mask-image: linear-gradient(
+      to top,
+      #000 0%,
+      rgba(0, 0, 0, 0.96) 52%,
+      rgba(0, 0, 0, 0.55) 80%,
+      transparent 100%
+    );
+    transform: translate3d(calc(var(--px) * 8px), calc(var(--py) * 6px), 0) scale(1.04);
+    transform-origin: center 70%;
+    will-change: transform;
+  }
+
+  .hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(56% 74% at 62% 86%, rgba(255, 178, 74, 0.28), transparent 72%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .hero__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+      90deg,
+      rgba(8, 17, 19, 0.72) 0%,
+      rgba(8, 17, 19, 0.06) 30%,
+      rgba(8, 17, 19, 0.05) 68%,
+      rgba(8, 17, 19, 0.7) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* 会慢慢游动的柔光 */
+  .hero__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    transform: translate3d(calc(var(--px) * 22px), calc(var(--py) * 16px), 0);
+    will-change: transform;
+  }
+
+  .hero__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    will-change: transform;
+  }
+
+  .hero__blob--amber {
+    right: -14vmin;
+    bottom: -26vmin;
+    width: 94vmin;
+    height: 94vmin;
+    background: radial-gradient(
+      circle,
+      rgba(255, 178, 74, 0.32) 0%,
+      rgba(226, 104, 60, 0.15) 46%,
+      transparent 72%
+    );
+    animation: wander-amber 26s ease-in-out infinite;
+  }
+
+  .hero__blob--ember {
+    left: -20vmin;
+    bottom: -30vmin;
+    width: 72vmin;
+    height: 72vmin;
+    background: radial-gradient(
+      circle,
+      rgba(226, 104, 60, 0.24) 0%,
+      rgba(168, 68, 42, 0.1) 48%,
+      transparent 74%
+    );
+    animation: wander-ember 32s ease-in-out infinite reverse;
+  }
+
+  .hero__blob--dusk {
+    top: -12vmin;
+    right: 6%;
+    width: 58vmin;
+    height: 58vmin;
+    background: radial-gradient(
+      circle,
+      rgba(138, 74, 86, 0.2) 0%,
+      rgba(78, 52, 66, 0.08) 50%,
+      transparent 74%
+    );
+    animation: wander-dusk 29s ease-in-out infinite;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 3;
+  }
+
+  .hero__title {
+    max-width: 12em;
+    font-family: var(--font-display);
+    font-size: clamp(42px, 6.2vw, 86px);
+    font-weight: 400;
+    line-height: 1.24;
+    letter-spacing: 0.015em;
+    color: var(--cream);
+    text-shadow: 0 4px 40px rgba(8, 17, 19, 0.6);
+  }
+
+  .hero__title-line {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .hero__break {
+    display: none;
+  }
+
+  .hero__title-accent {
+    color: var(--amber-soft);
+    text-shadow:
+      0 0 26px rgba(255, 178, 74, 0.32),
+      0 0 90px rgba(226, 104, 60, 0.22);
+  }
+
+  .hero__sub {
+    margin-top: 26px;
+    max-width: 30em;
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.95;
+    letter-spacing: 0.04em;
+    color: rgba(246, 231, 211, 0.74);
+  }
+
+  /* 夜空里的小星点 */
+  .hero__stars {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    transform: translate3d(calc(var(--px) * 18px), calc(var(--py) * 14px), 0);
+    will-change: transform;
+  }
+
+  .star {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: var(--star, #fff5e4);
+    box-shadow: 0 0 6px var(--star-glow, rgba(255, 240, 220, 0.75));
+    opacity: 0.45;
+    animation: twinkle var(--d) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  .star--white {
+    --star: #fff6e8;
+    --star-glow: rgba(255, 240, 220, 0.8);
+  }
+
+  .star--yellow {
+    --star: #ffd166;
+    --star-glow: rgba(255, 209, 102, 0.78);
+  }
+
+  .star--red {
+    --star: #ff7a63;
+    --star-glow: rgba(255, 122, 99, 0.75);
+  }
+
+  /* 火星粒子画布 */
+  .hero__embers {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* 向下走 */
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(20px, 4vh, 40px);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: rgba(246, 231, 211, 0.4);
+  }
+
+  .hero__scroll i {
+    position: relative;
+    width: 1px;
+    height: 34px;
+    background: linear-gradient(to bottom, rgba(255, 178, 74, 0.55), transparent);
+  }
+
+  .hero__scroll i::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -1.5px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    animation: fall 2.8s ease-in infinite;
+  }
+
+  @keyframes wander-amber {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    38% {
+      transform: translate3d(-7vw, 3vh, 0) scale(1.08);
+    }
+    70% {
+      transform: translate3d(3vw, -4vh, 0) scale(0.96);
+    }
+  }
+
+  @keyframes wander-ember {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1.05);
+    }
+    30% {
+      transform: translate3d(9vw, -5vh, 0) scale(0.94);
+    }
+    64% {
+      transform: translate3d(4vw, 4vh, 0) scale(1.12);
+    }
+  }
+
+  @keyframes wander-dusk {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    45% {
+      transform: translate3d(-5vw, 6vh, 0) scale(1.1);
+    }
+    75% {
+      transform: translate3d(2vw, -3vh, 0) scale(0.94);
+    }
+  }
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.16;
+      transform: scale(0.9);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.15);
+    }
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    18% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .hero {
+      padding-top: clamp(108px, 17vh, 150px);
+      padding-bottom: 120px;
+    }
+
+    .hero__title {
+      font-size: clamp(38px, 11.4vw, 54px);
+      line-height: 1.32;
+    }
+
+    .hero__break {
+      display: initial;
+    }
+
+    .hero__sub {
+      margin-top: 18px;
+      font-size: 15px;
+    }
+
+    .hero__blob--amber {
+      right: -28vmin;
+      bottom: -18vmin;
+      width: 120vmin;
+      height: 120vmin;
+    }
+
+    .hero__blob--dusk {
+      top: -6vmin;
+      right: -24vmin;
+    }
+
+    .hero__scroll {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__blob,
+    .star,
+    .hero__scroll i::after {
+      animation: none;
+    }
+
+    .hero__photo,
+    .hero__glow,
+    .hero__stars {
+      transform: none;
+    }
+
+    .star {
+      opacity: 0.5;
+    }
+
+    .hero__embers {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  const canvas = document.querySelector<HTMLCanvasElement>('#hero-embers');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (hero && canvas && !reduceMotion) {
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+
+    let width = 0;
+    let height = 0;
+    let visible = true;
+    let pointerActive = false;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    const makeSprite = (rgb: string) => {
+      const sprite = document.createElement('canvas');
+      const size = 32;
+      sprite.width = size;
+      sprite.height = size;
+      const spriteCtx = sprite.getContext('2d');
+      if (!spriteCtx) return sprite;
+
+      const gradient = spriteCtx.createRadialGradient(
+        size / 2,
+        size / 2,
+        0,
+        size / 2,
+        size / 2,
+        size / 2,
+      );
+      gradient.addColorStop(0, `rgba(${rgb}, 1)`);
+      gradient.addColorStop(0.32, `rgba(${rgb}, 0.42)`);
+      gradient.addColorStop(1, `rgba(${rgb}, 0)`);
+      spriteCtx.fillStyle = gradient;
+      spriteCtx.fillRect(0, 0, size, size);
+      return sprite;
+    };
+
+    const warmSprite = makeSprite('255, 150, 86');
+    const goldSprite = makeSprite('255, 214, 150');
+    const roseSprite = makeSprite('196, 92, 78');
+
+    type Ember = {
+      x: number;
+      y: number;
+      radius: number;
+      speed: number;
+      sway: number;
+      swaySpeed: number;
+      drift: number;
+      phase: number;
+      life: number;
+      age: number;
+      alpha: number;
+      sprite: HTMLCanvasElement;
+    };
+
+    let embers: Ember[] = [];
+
+    const spawn = (spreadOut: boolean): Ember => {
+      const radius = 0.9 + Math.random() * 1.3;
+      const roll = Math.random();
+
+      return {
+        x: Math.random() * width,
+        y: spreadOut ? Math.random() * height : height + radius * 6,
+        radius,
+        speed: 10 + Math.random() * 18,
+        sway: 5 + Math.random() * 14,
+        swaySpeed: 0.35 + Math.random() * 0.8,
+        drift: (Math.random() - 0.5) * 6,
+        phase: Math.random() * Math.PI * 2,
+        life: 9 + Math.random() * 8,
+        age: spreadOut ? Math.random() * 9 : 0,
+        alpha: 0.2 + Math.random() * 0.35,
+        sprite: roll < 0.16 ? roseSprite : roll < 0.52 ? goldSprite : warmSprite,
+      };
+    };
+
+    const resize = () => {
+      const rect = hero.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const count = Math.round(
+        Math.min(64, Math.max(14, (width * height) / 26000)),
+      );
+      if (embers.length > count) embers.length = count;
+      while (embers.length < count) embers.push(spawn(true));
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      targetX = (event.clientX / window.innerWidth) * 2 - 1;
+      targetY = (event.clientY / window.innerHeight) * 2 - 1;
+      pointerActive = true;
+    };
+
+    if (finePointer) {
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
+      window.addEventListener('pointerleave', () => {
+        pointerActive = false;
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting;
+        },
+        { threshold: 0 },
+      ).observe(hero);
+    }
+
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    let last = performance.now();
+
+    const frame = (now: number) => {
+      const delta = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      if (visible) {
+        if (finePointer) {
+          if (!pointerActive) {
+            targetX = Math.sin(now / 9000) * 0.26;
+            targetY = Math.cos(now / 11000) * 0.2;
+          }
+
+          currentX += (targetX - currentX) * Math.min(1, delta * 2.4);
+          currentY += (targetY - currentY) * Math.min(1, delta * 2.4);
+          hero.style.setProperty('--px', currentX.toFixed(3));
+          hero.style.setProperty('--py', currentY.toFixed(3));
+        }
+
+        if (ctx) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.globalCompositeOperation = 'lighter';
+
+          for (let index = 0; index < embers.length; index += 1) {
+            const ember = embers[index];
+            ember.age += delta;
+
+            if (ember.age > ember.life || ember.y < -24) {
+              embers[index] = spawn(false);
+              continue;
+            }
+
+            ember.y -= ember.speed * delta;
+            ember.x +=
+              (ember.drift + Math.sin(ember.age * ember.swaySpeed + ember.phase) * ember.sway) *
+              delta;
+
+            const progress = ember.age / ember.life;
+            const fade =
+              Math.min(1, progress / 0.15) * Math.min(1, (1 - progress) / 0.45);
+            ctx.globalAlpha = Math.max(0, ember.alpha * fade);
+
+            const size = ember.radius * 6;
+            ctx.drawImage(
+              ember.sprite,
+              ember.x - size / 2,
+              ember.y - size / 2,
+              size,
+              size,
+            );
+          }
+
+          ctx.globalAlpha = 1;
+          ctx.globalCompositeOperation = 'source-over';
+        }
+      }
+
+      window.requestAnimationFrame(frame);
+    };
+
+    window.requestAnimationFrame(frame);
+  }
+</script>
