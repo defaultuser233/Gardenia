@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import nest from '../../assets/photos/nest.jpg';
 import streetlight from '../../assets/photos/streetlight.jpg';
+import boardwalk from '../../assets/photos/boardwalk.jpg';
 
 const notes = [
   { label: '现在', text: '不知道写什么😺' },
@@ -18,7 +19,7 @@ const notes = [
         <div class="polaroid__frame">
           <Image
             src={nest}
-            alt="戴着黄色毛绒兽装脑袋，窝在白色毯子里打游戏"
+            alt="窝在打游戏"
             widths={[360, 560, 760]}
             sizes="(max-width: 900px) 78vw, 380px"
           />
@@ -26,15 +27,27 @@ const notes = [
         <figcaption>我的小窝</figcaption>
       </figure>
 
-      <figure class="window-card" data-reveal style="--reveal-delay:180ms">
-        <Image
-          src={streetlight}
-          alt="夜里的路灯透过树叶照下来，路边停着一辆自行车"
-          widths={[240, 380, 520]}
-          sizes="190px"
-        />
-        <figcaption>夜路</figcaption>
-      </figure>
+      <div class="about__side">
+        <figure class="window-card" data-reveal style="--reveal-delay:180ms">
+          <Image
+            src={boardwalk}
+            alt="夜里的木栈道，路灯把木板照成橘色"
+            widths={[340, 520, 680]}
+            sizes="(max-width: 900px) 42vw, 170px"
+          />
+          <figcaption>夜路</figcaption>
+        </figure>
+
+        <figure class="window-card" data-reveal style="--reveal-delay:260ms">
+          <Image
+            src={streetlight}
+            alt="夜里的路灯透过树叶照下来，路边停着一辆自行车"
+            widths={[240, 380, 520]}
+            sizes="(max-width: 900px) 42vw, 170px"
+          />
+          <figcaption>夜晚</figcaption>
+        </figure>
+      </div>
     </div>
 
     <div class="about__body">
@@ -99,6 +112,33 @@ const notes = [
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     align-items: start;
     gap: clamp(48px, 7vw, 104px);
+  }
+
+  .about__side {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 14px;
+    width: 100%;
+    margin-top: 26px;
+    padding-inline: 6px;
+  }
+
+  .about__side .window-card {
+    width: clamp(128px, 42%, 170px);
+    margin: 0;
+  }
+
+  .about__side .window-card:nth-child(1) {
+    transform: rotate(-2.2deg) translateY(8px);
+  }
+
+  .about__side .window-card:nth-child(2) {
+    transform: rotate(3deg);
+  }
+
+  .about__side .window-card:hover {
+    transform: rotate(0.5deg) translateY(-4px);
   }
 
   /* 拍立得 */
@@ -325,6 +365,13 @@ const notes = [
       display: block;
       width: 138px;
       margin: 20px 6% 0 auto;
+    }
+
+    .about__side {
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      padding-inline: 0;
     }
 
     .about__body {
