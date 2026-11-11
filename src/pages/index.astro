@@ -4,17 +4,16 @@ import SiteNav from '../components/SiteNav.astro';
 import Hero from '../components/sections/Hero.astro';
 import About from '../components/sections/About.astro';
 import SiteFooter from '../components/sections/SiteFooter.astro';
-import CursorGlow from '../components/atmosphere/CursorGlow.tsx';
 ---
 
 <BaseLayout>
   <SiteNav />
-  <main>
+  <main id="main" tabindex="-1">
     <Hero />
     <About />
   </main>
   <SiteFooter />
-  <CursorGlow client:load />
+  <div class="cursor-glow" aria-hidden="true"></div>
 </BaseLayout>
 
 <style>
@@ -44,3 +43,63 @@ import CursorGlow from '../components/atmosphere/CursorGlow.tsx';
     opacity: 1;
   }
 </style>
+
+<script>
+  const glow = document.querySelector<HTMLDivElement>('.cursor-glow');
+  const finePointer = window.matchMedia('(pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (glow && finePointer.matches && !reducedMotion.matches) {
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight * 0.4;
+    let currentX = targetX;
+    let currentY = targetY;
+    let frame = 0;
+    let visible = false;
+
+    const tick = () => {
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    const handleMove = (event: PointerEvent) => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+
+      if (!visible) {
+        visible = true;
+        glow.classList.add('is-on');
+      }
+
+      start();
+    };
+
+    const handleLeave = () => {
+      visible = false;
+      glow.classList.remove('is-on');
+      stop();
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) stop();
+      else if (visible) start();
+    };
+
+    window.addEventListener('pointermove', handleMove, { passive: true });
+    document.documentElement.addEventListener('pointerleave', handleLeave);
+    document.addEventListener('visibilitychange', handleVisibility);
+    start();
+  }
+</script>

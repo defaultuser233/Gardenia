@@ -1,5 +1,13 @@
 @import './tokens.css';
 
+@font-face {
+  font-family: 'LXGW WenKai';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/lxgw-wenkai-regular.woff2') format('woff2');
+}
+
 *,
 *::before,
 *::after {
@@ -140,6 +148,17 @@ button {
 
 .skip-link:focus-visible {
   transform: none;
+}
+
+/* 触屏设备：固定背景与全屏混合图层滚动开销高，降级处理 */
+@media (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .grain {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

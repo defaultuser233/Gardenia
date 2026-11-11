@@ -6,6 +6,11 @@ This repository uses a split license:
 - Source code: MIT License — see LICENSE
 - Photographs and images: All rights reserved — see LICENSE-IMAGES
 - Third-party brand icons in public/icons/: property of their respective owners
+- Heading typeface: LXGW WenKai, SIL Open Font License 1.1 — see public/fonts/OFL.txt
 
 You may reuse the source code under the MIT License, but the images are not
 licensed for reuse. If you would like to use an image, ask first.
+
+The self-hosted font in public/fonts/ is a subset of LXGW WenKai
+(Copyright 2021-2023 LXGW and 2020 The Klee Project Authors) and remains under
+the SIL Open Font License 1.1, not the MIT License.

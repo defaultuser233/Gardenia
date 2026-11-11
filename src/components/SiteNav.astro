@@ -99,6 +99,8 @@ const links = [
 </style>
 
 <script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+
   const sections = ['about', 'bye']
     .map((id) => document.getElementById(id))
     .filter((section): section is HTMLElement => Boolean(section));
@@ -107,26 +109,40 @@ const links = [
     document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'),
   );
 
-  if (sections.length) {
-    const updateActive = () => {
-      const marker = window.innerHeight * 0.45;
-      const atBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+  const syncScrolled = () => {
+    nav?.classList.toggle('is-scrolled', window.scrollY > 32);
+  };
 
-      const current = atBottom
-        ? sections[sections.length - 1]?.id
-        : sections.find((section) => {
-            const rect = section.getBoundingClientRect();
-            return rect.top <= marker && rect.bottom >= marker;
-          })?.id;
+  const updateActive = () => {
+    const marker = window.innerHeight * 0.45;
+    const atBottom =
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
 
-      navLinks.forEach((link) => {
-        link.classList.toggle('is-active', link.dataset.navLink === current);
-      });
-    };
+    const current = atBottom
+      ? sections[sections.length - 1]?.id
+      : sections.find((section) => {
+          const rect = section.getBoundingClientRect();
+          return rect.top <= marker && rect.bottom >= marker;
+        })?.id;
 
-    updateActive();
-    window.addEventListener('scroll', updateActive, { passive: true });
-    window.addEventListener('resize', updateActive);
-  }
+    navLinks.forEach((link) => {
+      const isActive = link.dataset.navLink === current;
+      link.classList.toggle('is-active', isActive);
+
+      if (isActive) {
+        link.setAttribute('aria-current', 'location');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  };
+
+  const syncNav = () => {
+    syncScrolled();
+    if (sections.length) updateActive();
+  };
+
+  syncNav();
+  window.addEventListener('scroll', syncNav, { passive: true });
+  window.addEventListener('resize', syncNav);
 </script>

@@ -64,7 +64,7 @@ const notes = [
           晚上世界会安静很多。周末通常在被窝里、在 Minecraft
           里，或者在被窝里。
         </p>
-        <p>😺😸😻😼😽😾</p>
+        <p aria-hidden="true">😺😸😻😼😽😾</p>
       </div>
 
       <p class="about__sign" data-reveal>
@@ -336,7 +336,7 @@ const notes = [
     margin-bottom: 5px;
     font-size: 10px;
     letter-spacing: 0.28em;
-    color: rgba(74, 52, 40, 0.55);
+    color: rgba(74, 52, 40, 0.72);
   }
 
   .note p {
@@ -386,8 +386,8 @@ const notes = [
 
   @media (max-width: 560px) {
     .notes {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
     .note {
